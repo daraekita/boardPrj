@@ -1,5 +1,6 @@
 package com.myown.board.controller;
 
+import com.myown.board.dto.user.LoginRequest;
 import com.myown.board.dto.user.SignUpRequest;
 import com.myown.board.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -26,5 +27,9 @@ public class UserController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-
+    @PostMapping("/login")
+    public ResponseEntity login(@RequestBody LoginRequest loginRequest){
+        userService.login(loginRequest);
+        return new ResponseEntity(HttpStatus.OK);
+    }
 }
