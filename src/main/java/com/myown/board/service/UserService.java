@@ -20,12 +20,16 @@ public class UserService {
 
     // 회원가입
     public void signUp(SignUpRequest signUpRequest) {
-        User user = new User();
+        User user = User.builder()
+                .loginId(signUpRequest.getLoginId())
+                .password(signUpRequest.getPassword())
+                .name(signUpRequest.getName())
+                .email(signUpRequest.getEmail()).build();
 
-        user.setLoginId(signUpRequest.getLoginId());
-        user.setPassword(signUpRequest.getPassword());
-        user.setName(signUpRequest.getName());
-        user.setEmail(signUpRequest.getEmail());
+//        user.setLoginId(signUpRequest.getLoginId());
+//        user.setPassword(signUpRequest.getPassword());
+//        user.setName(signUpRequest.getName());
+//        user.setEmail(signUpRequest.getEmail());
         userRepository.save(user);
     }
 
