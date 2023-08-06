@@ -9,7 +9,6 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Setter
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

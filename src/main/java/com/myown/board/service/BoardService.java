@@ -1,6 +1,6 @@
 package com.myown.board.service;
 
-import com.myown.board.dto.board.PostRequest;
+import com.myown.board.dto.board.CreateRequest;
 import com.myown.board.model.Board;
 import com.myown.board.repository.BoardRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -18,13 +18,13 @@ public class BoardService {
     }
 
     // 새 글쓰기
-    public void post(PostRequest postRequest) {
-        Board board = Board.builder()
-                        .userId(postRequest.getUserId())
-                        .title(postRequest.getTitle())
-                        .author(postRequest.getAuthor())
-                        .content(postRequest.getContent())
-                        .createdAt(postRequest.getCreatedAt()).build();
+    public void post(CreateRequest createRequest) {
+        Board board =   Board.builder()
+                        .userId(createRequest.getUserId())
+                        .title(createRequest.getTitle())
+                        .author(createRequest.getAuthor())
+                        .content(createRequest.getContent())
+                        .createdAt(createRequest.getCreatedAt()).build();
 
         boardRepository.save(board);
     }

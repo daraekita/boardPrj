@@ -1,6 +1,6 @@
 package com.myown.board.controller;
 
-import com.myown.board.dto.board.PostRequest;
+import com.myown.board.dto.board.CreateRequest;
 import com.myown.board.service.BoardService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +24,8 @@ public class BoardController {
 
     //게시물 생성
     @PostMapping
-    public ResponseEntity post(@RequestBody PostRequest postRequest){
-        boardService.post(postRequest);
+    public ResponseEntity create(@RequestBody CreateRequest createRequest){
+        boardService.post(createRequest);
         return new ResponseEntity(HttpStatus.OK);
     }
 

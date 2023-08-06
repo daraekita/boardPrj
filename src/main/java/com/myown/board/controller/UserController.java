@@ -32,4 +32,5 @@ public class UserController {
         userService.login(loginRequest);
         return new ResponseEntity(HttpStatus.OK);
     }
+
 }
