@@ -1,15 +1,13 @@
 package com.myown.board.controller;
 
+import com.myown.board.dto.board.BoardResponse;
 import com.myown.board.dto.board.CreateRequest;
 import com.myown.board.service.BoardService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/board")
@@ -29,4 +27,10 @@ public class BoardController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
+    //단건 게시물 조회
+    @GetMapping("/{boardId}")
+    public ResponseEntity<BoardResponse> getDetail(@PathVariable Long boardId){
+        BoardResponse boardResponse = boardService.getDetail(boardId);
+        return new ResponseEntity(boardResponse, HttpStatus.OK);
+    }
 }

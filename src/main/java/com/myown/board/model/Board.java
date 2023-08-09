@@ -1,5 +1,6 @@
 package com.myown.board.model;
 
+import com.myown.board.dto.board.BoardResponse;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,21 +13,26 @@ import java.time.LocalDateTime;
 public class Board {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private final Long boardId;
+    private Long boardId;
 
-    private final Long userId;
-    private final String title;
-    private final String author;
-    private final String content;
-    private final LocalDateTime createdAt;
+    private Long userId;
+    private String title;
+    private String author;
+    private String content;
+    private LocalDateTime createdAt;
 
-    private Board(Long boardId, Long userId, String title, String author, String content, LocalDateTime createdAt) {
-        this.boardId = boardId;
+    public Board() {}
+
+    private Board(Long userId, String title, String author, String content, LocalDateTime createdAt) {
         this.userId = userId;
         this.title = title;
         this.author = author;
         this.content = content;
         this.createdAt = createdAt;
+    }
+
+    public BoardResponse toDto() {
+        return new BoardResponse(this.boardId, this.title, this.author, this.content, this.createdAt);
     }
 
     public static Builder builder() {
@@ -72,7 +78,7 @@ public class Board {
         }
 
         public Board build() {
-            return new Board(boardId, userId, title, author, content, createdAt);
+            return new Board(userId, title, author, content, createdAt);
         }
     }
 }
