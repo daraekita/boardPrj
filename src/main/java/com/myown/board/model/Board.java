@@ -1,6 +1,7 @@
 package com.myown.board.model;
 
 import com.myown.board.dto.board.BoardResponse;
+import com.myown.board.dto.board.GetListResponse;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -33,6 +34,10 @@ public class Board {
 
     public BoardResponse toDto() {
         return new BoardResponse(this.boardId, this.title, this.author, this.content, this.createdAt);
+    }
+
+    public GetListResponse toListDto() {
+        return new GetListResponse(this.boardId, this.title, this.author, this.createdAt);
     }
 
     public static Builder builder() {

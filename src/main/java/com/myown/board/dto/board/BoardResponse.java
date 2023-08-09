@@ -20,4 +20,11 @@ public class BoardResponse {
         this.author = author;
         this.createdAt = createdAt;
     }
+
+    public BoardResponse(Long boardId, String title, String author, LocalDateTime createdAt) {
+        this.boardId = boardId;
+        this.title = title;
+        this.author = author;
+        this.createdAt = createdAt;
+    }
 }

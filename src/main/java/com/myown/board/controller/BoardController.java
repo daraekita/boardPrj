@@ -2,12 +2,15 @@ package com.myown.board.controller;
 
 import com.myown.board.dto.board.BoardResponse;
 import com.myown.board.dto.board.CreateRequest;
+import com.myown.board.dto.board.GetListResponse;
 import com.myown.board.service.BoardService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/board")
@@ -33,4 +36,15 @@ public class BoardController {
         BoardResponse boardResponse = boardService.getDetail(boardId);
         return new ResponseEntity(boardResponse, HttpStatus.OK);
     }
+
+    // 게시물 목록조회
+    @GetMapping("/list")
+    public ResponseEntity<List<GetListResponse>> getBoardList(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size){
+        List<GetListResponse> boardList = boardService.getBoardList(page, size);
+                return new ResponseEntity<>(boardList,HttpStatus.OK);
+    }
+
+
 }
