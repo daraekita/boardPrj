@@ -2,10 +2,11 @@ package com.myown.board.model;
 
 import jakarta.persistence.*;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-@Builder
 @Entity
+@NoArgsConstructor
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,5 +19,11 @@ public class Comment {
     private String loginId;
     private String content;
     private LocalDateTime createdAt;
-
+    @Builder
+    public Comment(Board board, String loginId, String content, LocalDateTime createdAt) {
+        this.board = board;
+        this.loginId = loginId;
+        this.content = content;
+        this.createdAt = createdAt;
+    }
 }

@@ -41,7 +41,6 @@ public class BoardService {
 
     public BoardResponse getDetail(Long boardId) {
         BoardResponse boardResponse = boardRepository.findByBoardId(boardId);
-        log.info("board title = {}", boardResponse.getTitle());
         return boardResponse;
     }
 
@@ -65,5 +64,9 @@ public class BoardService {
                     .build();
             commentRepository.save(comment);
         }
+    }
+
+    public void deleteBoard(Long boardId) {
+        boardRepository.deleteById(boardId);
     }
 }

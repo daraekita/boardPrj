@@ -47,6 +47,13 @@ public class BoardController {
                 return new ResponseEntity<>(boardList,HttpStatus.OK);
     }
 
+    // 게시물 삭제
+    @DeleteMapping("/{boardId}")
+    public ResponseEntity deleteBoard(@PathVariable Long boardId){
+        boardService.deleteBoard(boardId);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
     // 댓글 달기
     @PostMapping("/addComment")
     public ResponseEntity addComment(@RequestBody AddCommentRequest addCommentRequest){
