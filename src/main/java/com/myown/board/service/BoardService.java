@@ -1,11 +1,10 @@
 package com.myown.board.service;
 
-import com.myown.board.dto.board.BoardProjection;
-import com.myown.board.dto.board.BoardResponse;
-import com.myown.board.dto.board.CreateRequest;
-import com.myown.board.dto.board.GetListResponse;
+import com.myown.board.dto.board.*;
 import com.myown.board.model.Board;
+import com.myown.board.model.Comment;
 import com.myown.board.repository.BoardRepository;
+import com.myown.board.repository.CommentRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,27 +20,28 @@ import java.util.stream.Collectors;
 @Service
 public class BoardService {
     private final BoardRepository boardRepository;
+    private final CommentRepository commentRepository;
 
     @Autowired
-    public BoardService(BoardRepository boardRepository) {
+    public BoardService(BoardRepository boardRepository, CommentRepository commentRepository) {
         this.boardRepository = boardRepository;
+        this.commentRepository = commentRepository;
     }
 
-    // 새 글쓰기
     public void post(CreateRequest createRequest) {
-        Board board =   Board.builder()
-                        .userId(createRequest.getUserId())
-                        .title(createRequest.getTitle())
-                        .author(createRequest.getAuthor())
-                        .content(createRequest.getContent())
-                        .createdAt(LocalDateTime.now()).build();
+        Board board = Board.builder()
+                .userId(createRequest.getUserId())
+                .title(createRequest.getTitle())
+                .author(createRequest.getAuthor())
+                .content(createRequest.getContent())
+                .createdAt(LocalDateTime.now()).build();
 
         boardRepository.save(board);
     }
 
     public BoardResponse getDetail(Long boardId) {
         BoardResponse boardResponse = boardRepository.findByBoardId(boardId);
-        log.info("board title = {}",boardResponse.getTitle());
+        log.info("board title = {}", boardResponse.getTitle());
         return boardResponse;
     }
 
@@ -51,5 +51,19 @@ public class BoardService {
         return boardPage.getContent().stream()
                 .map(Board::toListDto)
                 .collect(Collectors.toList());
+    }
+
+    public void addComment(AddCommentRequest addCommentRequest) {
+        Board board = boardRepository.findById(addCommentRequest.getBoardId()).orElse(null);
+
+        if (board != null) {
+            Comment comment = Comment.builder()
+                    .board(board)
+                    .loginId(addCommentRequest.getLoginId())
+                    .content(addCommentRequest.getContent())
+                    .createdAt(LocalDateTime.now())
+                    .build();
+            commentRepository.save(comment);
+        }
     }
 }

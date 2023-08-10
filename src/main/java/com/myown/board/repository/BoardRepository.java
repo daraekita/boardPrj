@@ -1,6 +1,5 @@
 package com.myown.board.repository;
 
-import com.myown.board.dto.board.BoardProjection;
 import com.myown.board.dto.board.BoardResponse;
 import com.myown.board.model.Board;
 import org.springframework.data.jpa.repository.JpaRepository;
