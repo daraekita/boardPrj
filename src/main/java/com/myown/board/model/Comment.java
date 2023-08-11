@@ -19,6 +19,7 @@ public class Comment {
     private String loginId;
     private String content;
     private LocalDateTime createdAt;
+
     @Builder
     public Comment(Board board, String loginId, String content, LocalDateTime createdAt) {
         this.board = board;

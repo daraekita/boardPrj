@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -53,20 +54,33 @@ public class BoardService {
     }
 
     public void addComment(AddCommentRequest addCommentRequest) {
-        Board board = boardRepository.findById(addCommentRequest.getBoardId()).orElse(null);
+        Optional<Board> boardOptional = boardRepository.findById(addCommentRequest.getBoardId());
 
-        if (board != null) {
+        if(boardOptional.isPresent()){
             Comment comment = Comment.builder()
-                    .board(board)
+                    .board(boardOptional.get())
                     .loginId(addCommentRequest.getLoginId())
                     .content(addCommentRequest.getContent())
                     .createdAt(LocalDateTime.now())
                     .build();
             commentRepository.save(comment);
+        }else {
+            throw new IllegalStateException("게시글이 존재하지 않습니다");
         }
     }
 
     public void deleteBoard(Long boardId) {
         boardRepository.deleteById(boardId);
+    }
+
+    public void deleteComment(Long commentId) {
+        Optional<Comment> commentOptional = commentRepository.findById(commentId);
+
+        if (commentOptional.isPresent()) {
+            Comment comment = commentOptional.get();
+            commentRepository.delete(comment);
+        } else {
+             throw new IllegalStateException("댓글이 존재하지 않습니다.");
+        }
     }
 }

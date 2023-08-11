@@ -55,9 +55,17 @@ public class BoardController {
     }
 
     // 댓글 달기
-    @PostMapping("/addComment")
+    @PostMapping("/comment/add")
     public ResponseEntity addComment(@RequestBody AddCommentRequest addCommentRequest){
             boardService.addComment(addCommentRequest);
         return new ResponseEntity(HttpStatus.OK);
     }
+
+    // 댓글 삭제
+    @DeleteMapping("/comment/{commentId}")
+    public ResponseEntity deleteComment(@PathVariable Long commentId){
+        boardService.deleteComment(commentId);
+        return new ResponseEntity(HttpStatus.NOT_FOUND);
+    }
+
 }
