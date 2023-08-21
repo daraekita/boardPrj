@@ -6,11 +6,15 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
+
 public interface UserRepository extends JpaRepository<User, Long> {
     Long countByLoginIdAndPassword(String loginId, String password);
 
     @Modifying
     @Query("UPDATE User u SET u.password = ?2 WHERE u.id = ?1")
     void updatePassword(Long userId, String newPassword);
+
+    Optional<User> findByLoginId(String loginId);
 
 }

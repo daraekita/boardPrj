@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,12 +23,14 @@ public class UserController {
         this.userService = userService;
     }
 
+    // 회원가입
     @PostMapping("/signup")
     public ResponseEntity signUp(@RequestBody SignUpRequest signUpRequest){
         userService.signUp(signUpRequest);
         return new ResponseEntity(HttpStatus.OK);
     }
 
+    // 로그인
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody LoginRequest loginRequest){
         userService.login(loginRequest);
@@ -40,5 +43,4 @@ public class UserController {
         userService.pwModify(pwModifyRequest);
         return new ResponseEntity(HttpStatus.OK);
     }
-
 }
