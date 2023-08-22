@@ -35,7 +35,6 @@ public class JwtProvider {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
         log.info("key : {}", key);
-
     }
 
     /**

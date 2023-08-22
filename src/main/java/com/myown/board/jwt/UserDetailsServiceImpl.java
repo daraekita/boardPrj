@@ -22,7 +22,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String loginId) throws UserNotFoundException {
-        System.out.println("email in loadUserByUsername = " + loginId);
+        System.out.println("loingId in loadUserByUsername = " + loginId);
         User user = userRepository.findByLoginId(loginId)
                 .orElseThrow(UserNotFoundException::new);
         Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
@@ -32,6 +32,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .security
                 .core
                 .userdetails
-                .User(user.getEmail(), user.getPassword(), grantedAuthorities);
+                .User(user.getLoginId(), user.getPassword(), grantedAuthorities);
     }
 }

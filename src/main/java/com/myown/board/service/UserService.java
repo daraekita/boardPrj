@@ -58,7 +58,6 @@ public class UserService {
                             loginRequest.getPassword()
                     )
             );
-
             TokenResponse tokenResponse = jwtProvider.generateTokenDto(authentication);
 
             HttpHeaders httpHeaders = new HttpHeaders();
