@@ -1,16 +1,11 @@
 package com.myown.board.jwt;
 
-import com.myown.board.controller.UserController;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,7 +18,6 @@ import java.util.Date;
 import java.util.stream.Collectors;
 
 @Component
-@RequiredArgsConstructor
 @Log4j2
 public class JwtProvider {
 
@@ -31,26 +25,18 @@ public class JwtProvider {
     private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30; //30분
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7; // 7일
 
+    private final UserDetailsService userDetailsService;
+
     private final Key key;
 
     // yml 에 정의된 jwt.secret 값을 가져와 JWT 를 만들 때 사용하는 암호화 키값을 생성
-    public JwtProvider(@Value("${jwt.secret}") String secretKey) {
+    public JwtProvider(@Value("${spring.jwt.secret}") String secretKey, UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
         log.info("key : {}", key);
+
     }
-
-    @Value("${spring.jwt.secret}")
-    private String secretKey;
-
-    @Value("${spring.jwt.token.access-expiration-time}")
-    private long accessExpirationTime;
-
-    @Value("${spring.jwt.token.refresh-expiration-time}")
-    private long refreshExpirationTime;
-
-    @Autowired
-    private UserDetailsService userDetailsService;
 
     /**
      * Access 토큰 생성
@@ -90,7 +76,7 @@ public class JwtProvider {
      * 토큰으로부터 클레임을 만들고, 이를 통해 User 객체 생성해 Authentication 객체 반환
      */
     public Authentication getAuthentication(String token) {
-        String username = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
+        String username = Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody().getSubject();
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
@@ -112,7 +98,7 @@ public class JwtProvider {
      */
     public boolean validateToken(String token){
         try {
-            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+            Jwts.parser().setSigningKey(key).parseClaimsJws(token);
             return true;
         } catch (JwtException e) {
             // MalformedJwtException | ExpiredJwtException | IllegalArgumentException
