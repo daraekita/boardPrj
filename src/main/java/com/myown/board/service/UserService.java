@@ -18,6 +18,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -31,13 +32,15 @@ public class UserService {
     private final PasswordEncoder bCryptPasswordEncoder;
     private final JwtProvider jwtProvider;
     private final AuthenticationManager authenticationManager;
+    private final BCryptPasswordEncoder encoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder bCryptPasswordEncoder, JwtProvider jwtProvider, AuthenticationManager authenticationManager) {
+    public UserService(UserRepository userRepository, PasswordEncoder bCryptPasswordEncoder, JwtProvider jwtProvider, AuthenticationManager authenticationManager, BCryptPasswordEncoder encoder) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.jwtProvider = jwtProvider;
         this.authenticationManager = authenticationManager;
+        this.encoder = encoder;
     }
 
     // 회원가입
@@ -47,6 +50,7 @@ public class UserService {
                 .password(signUpRequest.getPassword())
                 .name(signUpRequest.getName())
                 .email(signUpRequest.getEmail()).build();
+        user.encodingPassword(encoder.encode(user.getPassword()));
         userRepository.save(user);
     }
 
@@ -58,8 +62,9 @@ public class UserService {
                             loginRequest.getPassword()
                     )
             );
-            TokenResponse tokenResponse = jwtProvider.generateTokenDto(authentication);
 
+            TokenResponse tokenResponse = jwtProvider.generateTokenDto(authentication);
+            log.info("AccessToken : {}",tokenResponse.getAccessToken());
             HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.add("Authorization", "Bearer " + tokenResponse.getAccessToken());
 

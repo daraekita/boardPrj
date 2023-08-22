@@ -1,9 +1,6 @@
 package com.myown.board.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,11 +18,19 @@ public class User {
     private String name;
     private String email;
 
+    @Enumerated(EnumType.STRING)
+    private Role role; // 사용자 권한
+
     private User(String loginId, String password, String name, String email) {
         this.loginId = loginId;
         this.password = password;
         this.name = name;
         this.email = email;
+        this.role = Role.ROLE_USER;
+    }
+
+    public void encodingPassword(String password) {
+        this.password = password;
     }
 
     public static Builder builder(){
