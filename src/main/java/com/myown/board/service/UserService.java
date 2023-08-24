@@ -1,7 +1,7 @@
 package com.myown.board.service;
 
-import com.myown.board.common.exception.CustomException;
 import com.myown.board.dto.user.LoginRequest;
+import com.myown.board.dto.user.LoginResponse;
 import com.myown.board.dto.user.PwModifyRequest;
 import com.myown.board.dto.user.SignUpRequest;
 import com.myown.board.jwt.JwtProvider;
@@ -9,15 +9,15 @@ import com.myown.board.jwt.TokenResponse;
 import com.myown.board.model.User;
 import com.myown.board.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,17 +29,19 @@ import java.util.Optional;
 @Transactional
 public class UserService {
     private final UserRepository userRepository;
-    private final PasswordEncoder bCryptPasswordEncoder;
     private final JwtProvider jwtProvider;
     private final AuthenticationManager authenticationManager;
+
+    private final AuthenticationManagerBuilder authenticationManagerBuilder;
+
     private final BCryptPasswordEncoder encoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder bCryptPasswordEncoder, JwtProvider jwtProvider, AuthenticationManager authenticationManager, BCryptPasswordEncoder encoder) {
+    public UserService(UserRepository userRepository, JwtProvider jwtProvider, AuthenticationManager authenticationManager, AuthenticationManagerBuilder authenticationManagerBuilder, BCryptPasswordEncoder encoder) {
         this.userRepository = userRepository;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.jwtProvider = jwtProvider;
         this.authenticationManager = authenticationManager;
+        this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.encoder = encoder;
     }
 
@@ -54,24 +56,18 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public ResponseEntity<TokenResponse> login(LoginRequest loginRequest) {
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            loginRequest.getLoginId(),
-                            loginRequest.getPassword()
-                    )
-            );
+    public LoginResponse login(LoginRequest loginRequest) {
 
-            TokenResponse tokenResponse = jwtProvider.generateTokenDto(authentication);
-            log.info("AccessToken : {}",tokenResponse.getAccessToken());
-            HttpHeaders httpHeaders = new HttpHeaders();
-            httpHeaders.add("Authorization", "Bearer " + tokenResponse.getAccessToken());
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(loginRequest.getLoginId(), loginRequest.getPassword());
 
-            return new ResponseEntity<>(tokenResponse, httpHeaders, HttpStatus.OK);
-        } catch (AuthenticationException e) {
-            throw new CustomException("Invalid credentials supplied", HttpStatus.UNPROCESSABLE_ENTITY);
-        }
+        Authentication authenticate = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+
+        TokenResponse tokenResponse = jwtProvider.generateTokenDto(authenticate);
+
+        LoginResponse loginResponse = new LoginResponse(tokenResponse);
+
+            return loginResponse;
     }
 
     public void showEditForm(Long userId) {
@@ -81,7 +77,6 @@ public class UserService {
             User user = userOptional.get();
         }
     }
-
 
     public void pwModify(PwModifyRequest pwModifyRequest) {
         String password1 = pwModifyRequest.getPassword1();

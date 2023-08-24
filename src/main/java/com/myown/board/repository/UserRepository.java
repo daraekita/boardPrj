@@ -15,4 +15,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     void updatePassword(Long userId, String newPassword);
 
     Optional<User> findByLoginId(String loginId);
+    Optional<User> findByEmail(String email);
 }

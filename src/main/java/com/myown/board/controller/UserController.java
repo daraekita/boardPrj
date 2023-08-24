@@ -1,8 +1,10 @@
 package com.myown.board.controller;
 
 import com.myown.board.dto.user.LoginRequest;
+import com.myown.board.dto.user.LoginResponse;
 import com.myown.board.dto.user.PwModifyRequest;
 import com.myown.board.dto.user.SignUpRequest;
+import com.myown.board.jwt.TokenResponse;
 import com.myown.board.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,8 +35,8 @@ public class UserController {
     // 로그인
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody LoginRequest loginRequest){
-        userService.login(loginRequest);
-        return new ResponseEntity(HttpStatus.OK);
+        LoginResponse loginResponse = userService.login(loginRequest);
+        return new ResponseEntity(loginResponse,HttpStatus.OK);
     }
 
     // 비밀번호 수정

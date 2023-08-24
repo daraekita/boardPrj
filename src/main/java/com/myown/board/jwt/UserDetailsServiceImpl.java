@@ -1,6 +1,7 @@
 package com.myown.board.jwt;
 
 import com.myown.board.common.exception.UserNotFoundException;
+import com.myown.board.jwt.config.JwtAuthenticationEntryPoint;
 import com.myown.board.model.User;
 import com.myown.board.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -32,8 +33,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         log.info("loginId = {}",loginId);
         User user = userRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new UsernameNotFoundException(loginId + "를 찾을 수 없습니다."));
+        /**
+         * 유저를 찾지 못해 UsernameNotFoundException가 발생하면 JwtAuthenticationEntryPoint를 호출 */
 
-        log.info("loginId2 = {}",loginId);
         Collection<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(() -> user.getRole().getKey()); // key: ROLE_권한
 
