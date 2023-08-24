@@ -5,6 +5,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,14 +22,19 @@ import java.util.stream.Collectors;
 @Log4j2
 public class JwtProvider {
 
+    @Value("${spring.jwt.token.access-expiration-time}")
+    private long ACCESS_TOKEN_EXPIRE_TIME;
+
+    @Value("${spring.jwt.token.refresh-expiration-time}")
+    private long REFRESH_TOKEN_EXPIRE_TIME;
+
     private static final String AUTHORITIES_KEY = "auth";
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30; //30분
-    private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7; // 7일
 
     private final UserDetailsService userDetailsService;
 
     private final Key key;
 
+    @Autowired
     // yml 에 정의된 jwt.secret 값을 가져와 JWT 를 만들 때 사용하는 암호화 키값을 생성
     public JwtProvider(@Value("${spring.jwt.secret}") String secretKey, UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;

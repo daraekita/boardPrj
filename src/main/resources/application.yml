@@ -10,15 +10,14 @@ spring:
     hibernate:
       ddl-auto: update
   jwt:
-    secret: c3RhcnJ5d2F2ZSdzX25ld3NpbmdsZV9tZV9pc19pbmNvbWluZ19teV9mdXR1cmVfaXNfd2l0aF9zdGFycnl3YXZlX2ltX2FscmVhZHlfMjd5ZWFyc19vbGRfZ29kX2RhbW5pdA==
     token:
       access-expiration-time: 43200000    # 12시간
       refresh-expiration-time: 604800000   # 7일
-
-    data:
-      redis:
-        host: localhost
-        port: 6379
+    secret: c3RhcnJ5d2F2ZSdzX25ld3NpbmdsZV9tZV9pc19pbmNvbWluZ19teV9mdXR1cmVfaXNfd2l0aF9zdGFycnl3YXZlX2ltX2FscmVhZHlfMjd5ZWFyc19vbGRfZ29kX2RhbW5pdA==
+  data:
+    redis:
+      host: localhost
+      port: 6379
 
   logging:
     level:
