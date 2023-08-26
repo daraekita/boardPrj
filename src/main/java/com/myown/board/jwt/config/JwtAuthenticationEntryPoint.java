@@ -31,5 +31,10 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         System.out.println(request.getRequestURI());
         log.error("UnAuthorized -- message : " + e.getMessage()); // 로그를 남기고
 //        response.sendRedirect("/users/signup"); // 로그인 페이지로 리다이렉트되도록 하였다.
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 상태 코드 설정
+
+        // 원하는 추가적인 응답 정보 설정 가능
+        response.setContentType("application/json");
+        response.getWriter().write("Unauthorized"); // JSON 형태의 응답 메시지 설정
     }
 }

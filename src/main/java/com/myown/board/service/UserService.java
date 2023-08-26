@@ -31,9 +31,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final JwtProvider jwtProvider;
     private final AuthenticationManager authenticationManager;
-
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
-
     private final BCryptPasswordEncoder encoder;
 
     @Autowired
@@ -87,6 +85,8 @@ public class UserService {
         } else if (!password1.equals(password2)) {
             throw new IllegalStateException("두 비밀번호가 일치하지 않습니다");
         }
-        userRepository.updatePassword(pwModifyRequest.getUserId(), pwModifyRequest.getPassword1());
+        String encodedPw = encoder.encode(password1);
+        userRepository.updatePassword(pwModifyRequest.getUserId(), encodedPw);
+
     }
 }

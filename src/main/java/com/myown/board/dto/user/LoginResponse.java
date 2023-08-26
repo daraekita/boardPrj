@@ -7,9 +7,11 @@ import lombok.Getter;
 public class LoginResponse {
     private String AccessToken;
     private String RefreshToken;
+    private Long AccessTokenExpireTime;
 
     public LoginResponse(TokenResponse tokenResponse) {
         AccessToken = tokenResponse.getAccessToken();
         RefreshToken = tokenResponse.getRefreshToken();
+        AccessTokenExpireTime = tokenResponse.getAccessTokenExpiresIn();
     }
 }

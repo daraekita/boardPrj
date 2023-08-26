@@ -1,6 +1,7 @@
 package com.myown.board.jwt.config;
 
 import com.myown.board.jwt.JwtProvider;
+import com.myown.board.jwt.filter.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @EnableWebSecurity
@@ -43,13 +45,14 @@ public class SecurityConfig {
                         .accessDeniedHandler(jwtAccessDeniedHandler)
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 )
-                .sessionManagement(sessionManagement -> sessionManagement
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+                    .sessionManagement(sessionManagement -> sessionManagement
+                            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    )
                 .authorizeRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/","/**","/users/**").permitAll()
+                        .requestMatchers("/","/users/login","/users/signup").permitAll()
                         .anyRequest().authenticated()
                 )
+                .addFilterBefore(new JwtFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 }
