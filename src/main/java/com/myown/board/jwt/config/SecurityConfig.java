@@ -40,6 +40,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
+                .httpBasic(httpBasic->httpBasic.disable())//auth 기반의 로그인창이 안뜨도록 설정.
+                .formLogin(formLogin->formLogin.disable())//폼로그인 사용 X
                 .csrf( (csrf) -> csrf.disable())
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .accessDeniedHandler(jwtAccessDeniedHandler)
@@ -49,7 +51,7 @@ public class SecurityConfig {
                             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     )
                 .authorizeRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/","/users/login","/users/signup").permitAll()
+                        .requestMatchers("/","/users/login","/users/signup","/error").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
