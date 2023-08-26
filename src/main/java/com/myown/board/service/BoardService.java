@@ -3,13 +3,18 @@ package com.myown.board.service;
 import com.myown.board.dto.board.*;
 import com.myown.board.model.Board;
 import com.myown.board.model.Comment;
+import com.myown.board.model.User;
 import com.myown.board.repository.BoardRepository;
 import com.myown.board.repository.CommentRepository;
+import com.myown.board.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -22,16 +27,27 @@ import java.util.stream.Collectors;
 public class BoardService {
     private final BoardRepository boardRepository;
     private final CommentRepository commentRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public BoardService(BoardRepository boardRepository, CommentRepository commentRepository) {
+    public BoardService(BoardRepository boardRepository, CommentRepository commentRepository, UserRepository userRepository) {
         this.boardRepository = boardRepository;
         this.commentRepository = commentRepository;
+        this.userRepository = userRepository;
     }
 
     public void post(CreateRequest createRequest) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        String loginId = authentication.getName();
+
+        User user = userRepository.findByLoginId(loginId)
+                .orElseThrow(()->new UsernameNotFoundException(loginId + "를 찾을 수 없습니다"));
+        Long userId = user.getUserId();
+
+        log.info("userID={}",userId);
         Board board = Board.builder()
-                .userId(createRequest.getUserId())
+                .userId(userId)
                 .title(createRequest.getTitle())
                 .author(createRequest.getAuthor())
                 .content(createRequest.getContent())

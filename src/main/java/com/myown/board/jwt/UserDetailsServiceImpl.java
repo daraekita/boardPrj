@@ -23,7 +23,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String loginId) throws UserNotFoundException {
-        log.info("loginId = {}",loginId);
+
         User user = userRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new UsernameNotFoundException(loginId + "를 찾을 수 없습니다."));
         /**
