@@ -107,11 +107,18 @@ public class BoardService {
     }
 
     public void deleteComment(Long commentId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String loginId = authentication.getName();
+
         Optional<Comment> commentOptional = commentRepository.findById(commentId);
 
         if (commentOptional.isPresent()) {
-            Comment comment = commentOptional.get();
-            commentRepository.delete(comment);
+            if(loginId.equals(commentOptional.get().getLoginId())){
+                Comment comment = commentOptional.get();
+                commentRepository.delete(comment);
+            }else {
+                throw new IllegalStateException("삭제할 권한이 없습니다.");
+            }
         } else {
              throw new IllegalStateException("댓글이 존재하지 않습니다.");
         }
