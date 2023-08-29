@@ -44,12 +44,12 @@ public class BoardService {
         User user = userRepository.findByLoginId(loginId)
                 .orElseThrow(()->new UsernameNotFoundException(loginId + "를 찾을 수 없습니다"));
         Long userId = user.getUserId();
+        String author = user.getLoginId();
 
-        log.info("userID={}",userId);
         Board board = Board.builder()
                 .userId(userId)
                 .title(createRequest.getTitle())
-                .author(createRequest.getAuthor())
+                .author(author)
                 .content(createRequest.getContent())
                 .createdAt(LocalDateTime.now()).build();
 
@@ -57,7 +57,8 @@ public class BoardService {
     }
 
     public BoardResponse getDetail(Long boardId) {
-        BoardResponse boardResponse = boardRepository.findByBoardId(boardId);
+        BoardResponse boardResponse = boardRepository.findByBoardId(boardId)
+                .orElseThrow(()->  new IllegalStateException("찾는 게시물이 없습니다."));
         return boardResponse;
     }
 
@@ -70,6 +71,13 @@ public class BoardService {
     }
 
     public void addComment(AddCommentRequest addCommentRequest) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String loginId = authentication.getName();
+        User user = userRepository.findByLoginId(loginId)
+                .orElseThrow(()->new UsernameNotFoundException(loginId + "를 찾을 수 없습니다"));
+        Long userId = user.getUserId();
+
         Optional<Board> boardOptional = boardRepository.findById(addCommentRequest.getBoardId());
 
         if(boardOptional.isPresent()){
@@ -86,6 +94,14 @@ public class BoardService {
     }
 
     public void deleteBoard(Long boardId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String loginId = authentication.getName();
+
+        BoardResponse boardResponse = boardRepository.findByBoardId(boardId).orElseThrow(()->new UsernameNotFoundException("게시물 없음"));
+
+        if(!loginId.equals(boardResponse.getLoginId())){
+            throw new IllegalStateException("삭제할 권한이 없습니다");
+        }
         boardRepository.deleteById(boardId);
     }
 

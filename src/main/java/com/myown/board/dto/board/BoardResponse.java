@@ -10,21 +10,21 @@ public class BoardResponse {
     private Long boardId;
     private String title;
     private String content;
-    private String author;
+    private String loginId;
     private LocalDateTime createdAt;
 
-    public BoardResponse(Long boardId, String title, String content, String author, LocalDateTime createdAt) {
+    public BoardResponse(Long boardId, String title, String content, String loginId, LocalDateTime createdAt) {
         this.boardId = boardId;
         this.title = title;
         this.content = content;
-        this.author = author;
+        this.loginId = loginId;
         this.createdAt = createdAt;
     }
 
-    public BoardResponse(Long boardId, String title, String author, LocalDateTime createdAt) {
+    public BoardResponse(Long boardId, String title, String loginId, LocalDateTime createdAt) {
         this.boardId = boardId;
         this.title = title;
-        this.author = author;
+        this.loginId = loginId;
         this.createdAt = createdAt;
     }
 }

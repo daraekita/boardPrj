@@ -7,9 +7,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface BoardRepository extends JpaRepository<Board, Long> {
     @Query("SELECT new com.myown.board.dto.board.BoardResponse(b.boardId, b.title, b.content, b.author, b.createdAt) FROM Board b WHERE b.boardId = :boardId")
-    BoardResponse findByBoardId(@Param("boardId") Long boardId);
+    Optional<BoardResponse> findByBoardId(@Param("boardId") Long boardId);
 
+    Optional<Board> findByUserId(Long userId);
 }

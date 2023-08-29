@@ -1,12 +1,18 @@
 package com.myown.board.model;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 @Entity
-@NoArgsConstructor
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -14,17 +20,12 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name = "boardId")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Board board;
 
     private String loginId;
     private String content;
     private LocalDateTime createdAt;
 
-    @Builder
-    public Comment(Board board, String loginId, String content, LocalDateTime createdAt) {
-        this.board = board;
-        this.loginId = loginId;
-        this.content = content;
-        this.createdAt = createdAt;
-    }
+
 }
