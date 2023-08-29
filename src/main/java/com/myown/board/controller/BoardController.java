@@ -1,6 +1,6 @@
 package com.myown.board.controller;
 
-import com.myown.board.dto.board.AddCommentRequest;
+import com.myown.board.dto.comment.AddCommentRequest;
 import com.myown.board.dto.board.BoardResponse;
 import com.myown.board.dto.board.CreateRequest;
 import com.myown.board.dto.board.GetListResponse;
@@ -55,9 +55,9 @@ public class BoardController {
     }
 
     // 댓글 달기
-    @PostMapping("/comment/add")
-    public ResponseEntity addComment(@RequestBody AddCommentRequest addCommentRequest){
-            boardService.addComment(addCommentRequest);
+    @PostMapping("/comment/{boardId}")
+    public ResponseEntity addComment(@PathVariable Long boardId, @RequestBody AddCommentRequest addCommentRequest){
+            boardService.addComment(boardId, addCommentRequest);
         return new ResponseEntity(HttpStatus.OK);
     }
 

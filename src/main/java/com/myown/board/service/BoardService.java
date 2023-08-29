@@ -1,6 +1,8 @@
 package com.myown.board.service;
 
 import com.myown.board.dto.board.*;
+import com.myown.board.dto.comment.AddCommentRequest;
+import com.myown.board.dto.comment.CommentResponse;
 import com.myown.board.model.Board;
 import com.myown.board.model.Comment;
 import com.myown.board.model.User;
@@ -70,28 +72,27 @@ public class BoardService {
                 .collect(Collectors.toList());
     }
 
-    public void addComment(AddCommentRequest addCommentRequest) {
+    public void addComment(Long boardId, AddCommentRequest addCommentRequest) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String loginId = authentication.getName();
         User user = userRepository.findByLoginId(loginId)
                 .orElseThrow(()->new UsernameNotFoundException(loginId + "를 찾을 수 없습니다"));
-        Long userId = user.getUserId();
 
-        Optional<Board> boardOptional = boardRepository.findById(addCommentRequest.getBoardId());
+        Board board = boardRepository.findByBoardIdCustom(boardId)
+                .orElseThrow(()->new UsernameNotFoundException("찾는 게시판이 없습니다."));
 
-        if(boardOptional.isPresent()){
-            Comment comment = Comment.builder()
-                    .board(boardOptional.get())
-                    .loginId(addCommentRequest.getLoginId())
-                    .content(addCommentRequest.getContent())
-                    .createdAt(LocalDateTime.now())
-                    .build();
+        Comment comment = Comment.builder()
+                        .loginId(loginId)
+                        .content(addCommentRequest.getContent())
+                        .user(user)
+                        .board(board)
+                        .createdAt(LocalDateTime.now()).build();
+
             commentRepository.save(comment);
-        }else {
-            throw new IllegalStateException("게시글이 존재하지 않습니다");
         }
-    }
+
+
 
     public void deleteBoard(Long boardId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

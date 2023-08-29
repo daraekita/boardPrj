@@ -21,10 +21,4 @@ public class BoardResponse {
         this.createdAt = createdAt;
     }
 
-    public BoardResponse(Long boardId, String title, String loginId, LocalDateTime createdAt) {
-        this.boardId = boardId;
-        this.title = title;
-        this.loginId = loginId;
-        this.createdAt = createdAt;
-    }
 }

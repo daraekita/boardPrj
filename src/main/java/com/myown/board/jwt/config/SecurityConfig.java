@@ -53,7 +53,7 @@ public class SecurityConfig {
                     )
                 .authorizeRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers("/","/users/login","/users/signup","/error").permitAll()
-                        .requestMatchers(HttpMethod.GET,"/board/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/board/**","/board/list").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
