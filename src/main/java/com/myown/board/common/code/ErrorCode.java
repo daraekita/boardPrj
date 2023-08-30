@@ -13,9 +13,13 @@ public enum ErrorCode {
      * 500 : Internal Server Error
      * 503 : Service Unavailable
      */
+    //common
+    REDIS_ERROR(503, "C001", "Reids연결이 실패했습니다"),
+    INVALID_JWT(401,"C002","유효하지 않은 JWT 입니다."),
+
     //user
-    REDIS_ERROR(503, "U001", "Reids연결이 실패했습니다"),
-    INVALID_JWT(401,"U002","유효하지 않은 JWT 입니다.");
+    LOGINID_CONFLICT(409,"U001","중복된 아이디 입니다");
+
 
     //에러의 코드 상태 반환
     private final int status;

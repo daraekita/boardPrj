@@ -1,5 +1,7 @@
 package com.myown.board.service;
 
+import com.myown.board.common.code.ErrorCode;
+import com.myown.board.common.exception.CustomIllegalStateException;
 import com.myown.board.dto.user.LoginRequest;
 import com.myown.board.dto.user.LoginResponse;
 import com.myown.board.dto.user.PwModifyRequest;
@@ -9,17 +11,14 @@ import com.myown.board.jwt.TokenResponse;
 import com.myown.board.model.User;
 import com.myown.board.repository.UserRepository;
 import jakarta.transaction.Transactional;
-import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -30,15 +29,13 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository userRepository;
     private final JwtProvider jwtProvider;
-    private final AuthenticationManager authenticationManager;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final BCryptPasswordEncoder encoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, JwtProvider jwtProvider, AuthenticationManager authenticationManager, AuthenticationManagerBuilder authenticationManagerBuilder, BCryptPasswordEncoder encoder) {
+    public UserService(UserRepository userRepository, JwtProvider jwtProvider, AuthenticationManagerBuilder authenticationManagerBuilder, BCryptPasswordEncoder encoder) {
         this.userRepository = userRepository;
         this.jwtProvider = jwtProvider;
-        this.authenticationManager = authenticationManager;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.encoder = encoder;
     }
@@ -46,7 +43,7 @@ public class UserService {
     // 회원가입
     public ResponseEntity signUp(SignUpRequest signUpRequest) {
         if(userRepository.existsByLoginId(signUpRequest.getLoginId())){
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("중복된 아이디 입니다.");
+            throw new CustomIllegalStateException(ErrorCode.LOGINID_CONFLICT);
         }
         User user = User.builder()
                 .loginId(signUpRequest.getLoginId())
@@ -55,7 +52,7 @@ public class UserService {
                 .email(signUpRequest.getEmail()).build();
         user.encodingPassword(encoder.encode(user.getPassword()));
         userRepository.save(user);
-        return new ResponseEntity(HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).body("회원가입 완료");
     }
 
     public LoginResponse login(LoginRequest loginRequest) {
