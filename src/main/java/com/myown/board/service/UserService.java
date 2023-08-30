@@ -44,7 +44,10 @@ public class UserService {
     }
 
     // 회원가입
-    public void signUp(SignUpRequest signUpRequest) {
+    public ResponseEntity signUp(SignUpRequest signUpRequest) {
+        if(userRepository.existsByLoginId(signUpRequest.getLoginId())){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("중복된 아이디 입니다.");
+        }
         User user = User.builder()
                 .loginId(signUpRequest.getLoginId())
                 .password(signUpRequest.getPassword())
@@ -52,6 +55,7 @@ public class UserService {
                 .email(signUpRequest.getEmail()).build();
         user.encodingPassword(encoder.encode(user.getPassword()));
         userRepository.save(user);
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     public LoginResponse login(LoginRequest loginRequest) {
