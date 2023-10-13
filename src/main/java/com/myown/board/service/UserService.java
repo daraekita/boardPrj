@@ -10,6 +10,7 @@ import com.myown.board.jwt.JwtProvider;
 import com.myown.board.jwt.TokenResponse;
 import com.myown.board.model.User;
 import com.myown.board.repository.UserRepository;
+import com.myown.board.util.RedisUtil;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,13 +32,15 @@ public class UserService {
     private final JwtProvider jwtProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final BCryptPasswordEncoder encoder;
+    private final RedisUtil redisUtil;
 
     @Autowired
-    public UserService(UserRepository userRepository, JwtProvider jwtProvider, AuthenticationManagerBuilder authenticationManagerBuilder, BCryptPasswordEncoder encoder) {
+    public UserService(UserRepository userRepository, JwtProvider jwtProvider, AuthenticationManagerBuilder authenticationManagerBuilder, BCryptPasswordEncoder encoder, RedisUtil redisUtil) {
         this.userRepository = userRepository;
         this.jwtProvider = jwtProvider;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.encoder = encoder;
+        this.redisUtil = redisUtil;
     }
 
     // 회원가입
@@ -55,6 +58,7 @@ public class UserService {
         return ResponseEntity.status(HttpStatus.OK).body("회원가입 완료");
     }
 
+    // 로그인
     public LoginResponse login(LoginRequest loginRequest) {
 
         UsernamePasswordAuthenticationToken authenticationToken =
@@ -89,5 +93,35 @@ public class UserService {
         String encodedPw = encoder.encode(password1);
         userRepository.updatePassword(pwModifyRequest.getUserId(), encodedPw);
 
+    }
+
+    public TokenResponse renewToken(String accessToken, String refreshToken) {
+        // 1. 검증
+        if (!jwtProvider.validateToken(refreshToken)) {
+            throw new CustomIllegalStateException(ErrorCode.INVALID_JWT);
+        }
+
+        // 2. Access Token 에서 User ID 가져오기
+        Authentication authentication = jwtProvider.getAuthentication(accessToken);
+        String userId = authentication.getName();
+
+        // 3. 저장소에서 User ID 를 기반으로 Refresh Token 값 가져오기
+        String findRefreshToken = redisUtil.getData(userId);
+        if (findRefreshToken == null) {
+            throw new CustomIllegalStateException(ErrorCode.INVALID_JWT);
+        }
+
+        // 4. Refresh Token 일치하는지 검사
+        if (!refreshToken.equals(findRefreshToken)) {
+            throw new CustomIllegalStateException(ErrorCode.NO_MATCHES_INFO);
+        }
+
+        // 5. 새로운 토큰 생성
+        TokenResponse tokenResponse = jwtProvider.generateTokenDto(authentication);
+
+        // 6. 저장소 정보 업데이트
+        redisUtil.setDataExpire(userId, tokenResponse.getRefreshToken(), 1000 * 60 * 60 * 24 * 7);
+
+        return tokenResponse;
     }
 }

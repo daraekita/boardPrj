@@ -16,9 +16,9 @@ public enum ErrorCode {
     //common
     REDIS_ERROR(503, "C001", "Reids연결이 실패했습니다"),
     INVALID_JWT(401,"C002","유효하지 않은 JWT 입니다."),
-
     //user
-    LOGINID_CONFLICT(409,"U001","중복된 아이디 입니다");
+    LOGINID_CONFLICT(409,"U001","중복된 아이디 입니다"),
+    NO_MATCHES_INFO(400, "U002", "토큰의 유저 정보가 일치하지 않습니다.");
 
 
     //에러의 코드 상태 반환

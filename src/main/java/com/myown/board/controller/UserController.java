@@ -4,6 +4,7 @@ import com.myown.board.dto.user.LoginRequest;
 import com.myown.board.dto.user.LoginResponse;
 import com.myown.board.dto.user.PwModifyRequest;
 import com.myown.board.dto.user.SignUpRequest;
+import com.myown.board.jwt.TokenResponse;
 import com.myown.board.service.UserService;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -41,4 +42,14 @@ public class UserController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
+    @PostMapping("/reissue")
+    public ResponseEntity renewToken(@RequestHeader(value = "Authorization") String acTokenRequest,
+                                  @RequestHeader(value = "RefreshToken") String rfTokenRequest){
+        String accessToken = acTokenRequest.substring(7);
+        String refreshToken = rfTokenRequest.substring(7);
+
+        TokenResponse tokenResponse = userService.renewToken(accessToken, refreshToken);
+
+        return new ResponseEntity(tokenResponse, HttpStatus.OK);
+    }
 }

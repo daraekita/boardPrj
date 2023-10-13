@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @Component
 @Log4j2
 public class JwtProvider {
-
+    // application.yml 에 정의한 만료시간 가져오기
     @Value("${spring.jwt.token.access-expiration-time}")
     private long ACCESS_TOKEN_EXPIRE_TIME;
 
@@ -35,7 +35,7 @@ public class JwtProvider {
     private final Key key;
 
     @Autowired
-    // yml 에 정의된 jwt.secret 값을 가져와 JWT 를 만들 때 사용하는 암호화 키값을 생성
+    // application.yml 에 정의된 jwt.secret 값을 가져와 JWT 를 만들 때 사용하는 암호화 키값을 생성
     public JwtProvider(@Value("${spring.jwt.secret}") String secretKey, UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
@@ -43,9 +43,7 @@ public class JwtProvider {
         log.info("key : {}", key);
     }
 
-    /**
-     * Access 토큰 생성
-     */
+    // 토큰 생성
     public TokenResponse generateTokenDto(Authentication authentication) {
         // 권한 가져오기
         String authorities = authentication.getAuthorities().stream()
@@ -77,9 +75,7 @@ public class JwtProvider {
                 .build();
     }
 
-    /**
-     * 토큰으로부터 클레임을 만들고, 이를 통해 User 객체 생성해 Authentication 객체 반환
-     */
+    // 인증 정보 추출
     public Authentication getAuthentication(String token) {
         String username = Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody().getSubject();
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
@@ -87,9 +83,7 @@ public class JwtProvider {
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
-    /**
-     * http 헤더로부터 bearer 토큰을 가져옴.
-     */
+    // http 헤더에서 bearer 토큰 추출
     public String resolveToken(HttpServletRequest req) {
         String bearerToken = req.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer")) {
@@ -98,9 +92,7 @@ public class JwtProvider {
         return null;
     }
 
-    /**
-     * Access 토큰을 검증
-     */
+    // Access 토큰을 검증
     public boolean validateToken(String token){
         try {
             Jwts.parser().setSigningKey(key).parseClaimsJws(token);

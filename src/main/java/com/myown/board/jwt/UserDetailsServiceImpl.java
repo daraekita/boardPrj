@@ -30,7 +30,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
          * 유저를 찾지 못해 UsernameNotFoundException가 발생하면 JwtAuthenticationEntryPoint를 호출 */
 
         Collection<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(() -> user.getRole().getKey()); // key: ROLE_권한
+        authorities.add(() -> user.getRole().getKey());
 
         return new org
                 .springframework
